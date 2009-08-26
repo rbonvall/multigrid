@@ -59,15 +59,19 @@ def main():
     colorbar()
     title('CG error (norm = %f)' % norm(error))
 
-    # operators for coarse grid correction
-    R = multigrid.restriction_operator(N)
-    P = 4 * R.transpose()
-    A_2h = R.matmat(A).matmat(P)
+    # initial guess
+    u = zeros_like(u)
 
-    # improve u using coarse grid correction
-    print "Coarse grid correction"
+    # pre-smoothing
+    for _ in xrange(2):
+        u = dot(M, u) + b
+
+    # coarse grid correction
     e_h = multigrid.coarse_grid_correction_step(A, f, u, R, P, A_2h)
-    print norm(e_h)
+
+    # post-smoothing
+    for _ in xrange(2):
+        u = dot(M, u) + b
     
     subplot(233)
     contourf(i, j, u.reshape(i.shape))
