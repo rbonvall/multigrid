@@ -20,6 +20,25 @@ def main():
     A, f = model_problem.create_problem(i, j)
     u_e = model_problem.exact_u(i, j).flatten()
 
+    # matrices for Gauss Seidel relaxation
+    # TODO: use sparse operations
+    print "descomponiendo A"
+    Ad = A.todense()
+    D = diag(diag(Ad))
+    L = D - tril(Ad)
+    U = D - triu(Ad)
+    del Ad
+    # TODO: smarter inverse
+    print "creando M y b"
+    idl = inv(D - L)
+    M = dot(idl, U)
+    b = dot(idl, f)
+
+    # operators for coarse grid correction
+    R = multigrid.restriction_operator(N)
+    P = 4 * R.transpose()
+    A_2h = R.matmat(A).matmat(P)
+
     print "Plotting exact solution"
     subplot(231)
     contourf(i, j, u_e.reshape(i.shape))
