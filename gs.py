@@ -26,12 +26,13 @@ def red_black_gauss_seidel_step(u, f, h):
                  verbose=1)
     
 
-def pure_python_rbgs(u, f, h):
+def pure_python_red_black_gauss_seidel_step(u, f, h):
     m, n = u.shape
     h2 = h * h;
     for sweep in ('red', 'black'):
         for i in range(1, m - 1):
-           for j in range(1 + i % 2 if sweep == 'red' else 2 - i % 2, n - 1, 2):
+            start = 1 + i % 2 if sweep == 'red' else 2 - i % 2
+            for j in range(start, n - 1, 2):
                 u[i, j] = (u[i + 1, j] +
                            u[i - 1, j] +
                            u[i, j + 1] +
