@@ -41,8 +41,22 @@ def pure_python_red_black_gauss_seidel_step(u, f, h):
 
 
 def main():
+    from pylab import figure, subplot, contour, contourf, title, show, colorbar
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option('-n', '--grid-size', type=int, default=64)
+    parser.add_option('-i', '--iterations', type=int, default=0)
+    parser.add_option('-p', '--pure-python', action='store_true', default=False)
+    (options, args) = parser.parse_args()
+
+    if options.pure_python:
+        rbgs_step = pure_python_red_black_gauss_seidel_step
+    else:
+        rbgs_step = red_black_gauss_seidel_step
+
     # create grid for test problem
-    N = 64
+    N = options.grid_size
     i_dom = linspace(0.0, 1.0, N + 1)
     j_dom = linspace(0.0, 1.0, N + 1)
     i, j = meshgrid(i_dom, j_dom)
@@ -60,43 +74,35 @@ def main():
         return (i**2 - i**4) * (j**4 - j**2)
     exact_u = solution(i, j)
 
-    from pylab import figure, subplot, contour, contourf, title, show, colorbar
-    
-    figure(1)
     # subplot grid size
     M, N = 4, 6
 
-    subplot(M, N, 1)
-    contour(i, j, exact_u)
-    colorbar()
-    title('Exact solution')
-    
-    subplot(M, N, 2)
-    contour(i, j, f)
-    colorbar()
-    title('Source term')
+    def add_plot(k, fn, plot_title, *args):
+        subplot(M, N, k)
+        contour(i, j, fn, *args)
+        colorbar()
+        title(plot_title)
 
-    subplot(M, N, 3)
-    contour(i, j, u)
-    title('Initial guess')
+    add_plot(1, exact_u, 'Exact solution')
+    add_plot(2, f, 'Source term')
+    add_plot(3, u, 'Initial guess')
 
+    if options.iterations:
+        iterations_per_plot = int(ceil(options.iterations / (M * N - 3)))
+    else:
+        iterations_per_plot = 100
     iteration = 0
-    iterations_per_plot = 100
     for p in range(4, M * N + 1):
         # relaxation steps
         for k in range(iterations_per_plot):
-            #pure_python_rbgs(u, f, h)
-            red_black_gauss_seidel_step(u, f, h)
+            rbgs_step(u, f, h)
 
         iteration += iterations_per_plot
         print iteration
 
         error_norm = norm(u - exact_u)
 
-        subplot(M, N, p)
-        contour(i, j, u)
-        colorbar()
-        title('k = %d (error = %f)' % (iteration, error_norm))
+        add_plot(p, u, 'k = %d (error = %f)' % (iteration, error_norm))
 
     show()
 
