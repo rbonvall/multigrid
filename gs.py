@@ -13,8 +13,8 @@ def red_black_gauss_seidel_step(u, f, h):
     code = '''
         double h2 = (double) h * (double) h;
         for (int sweep = 0; sweep <= 1; ++sweep)
-            for (int i = 1; i < m; ++i)
-                for (int j = (sweep ? 2 - i % 2 : 1 + i % 2); j < n; j += 2)
+            for (int i = 1; i < m - 1; ++i)
+                for (int j = (sweep ? 2 - i % 2 : 1 + i % 2); j < n - 1; j += 2)
                     u(i, j) = (u(i + 1, j) +
                                u(i - 1, j) +
                                u(i, j + 1) +
