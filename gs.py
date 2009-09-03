@@ -7,6 +7,7 @@ from __future__ import division
 from numpy import *
 from scipy import weave
 from scipy.linalg import norm
+import time
 
 def red_black_gauss_seidel_step(u, f, h):
     m, n = u.shape
@@ -48,6 +49,7 @@ def main():
     parser.add_option('-n', '--grid-size', type=int, default=64)
     parser.add_option('-i', '--iterations', type=int, default=0)
     parser.add_option('-p', '--pure-python', action='store_true', default=False)
+    parser.add_option('-v', '--verbose', action='store_true', default=False)
     (options, args) = parser.parse_args()
 
     if options.pure_python:
@@ -92,17 +94,27 @@ def main():
     else:
         iterations_per_plot = 100
     iteration = 0
+    new_error = norm(u - exact_u)
+
+    if options.verbose:
+        print 'Problem size:', options.grid_size
+        print 'Total iterations:', options.iterations
+        print 'Iterations per plot:', iterations_per_plot
+
     for p in range(4, M * N + 1):
         # relaxation steps
+        start = time.clock()
         for k in range(iterations_per_plot):
             rbgs_step(u, f, h)
-
+        avg_iteration_time = (time.clock() - start) / iterations_per_plot
+        previous_error, new_error = new_error, norm(u - exact_u)
+        if options.verbose:
+            improval = abs((previous_error - new_error)/previous_error)
+            print 'k=%d to %d' % (iteration, iteration + iterations_per_plot),
+            print '[avg improval: %f]' % (improval/iterations_per_plot),
+            print '[avg time: %f]' % (avg_iteration_time)
         iteration += iterations_per_plot
-        print iteration
-
-        error_norm = norm(u - exact_u)
-
-        add_plot(p, u, 'k = %d (error = %f)' % (iteration, error_norm))
+        add_plot(p, u, 'k = %d (error = %f)' % (iteration, new_error))
 
     show()
 
