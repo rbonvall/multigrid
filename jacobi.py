@@ -31,11 +31,11 @@ def main():
     parser.add_option('-f', help='Fourier mode', type=int, default=1)
     parser.add_option('-p', help='Number of plots', type=int, default=50)
     parser.add_option('-i', help='Iterations per plot', type=int, default=1)
+    parser.add_option('-w', help='Jacobi weight', type=float, default=2/3)
     options, args = parser.parse_args()
 
     A = model_problem(options.n)
     D_inv = scipy.sparse.spdiags([scipy.sparse.extract_diagonal(A) ** -1], [0], *A.shape)
-    w = 2/3
 
     # initial guess: Fourier modes
     v = fourier_mode(options.f, options.n)
@@ -58,7 +58,7 @@ def main():
 
         # weighted Jacobi in stationary linear iteration form
         r = -A.matvec(v)
-        v = v + w * D_inv.matvec(r)
+        v = v + options.w * D_inv.matvec(r)
 
 
     show()
