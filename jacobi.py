@@ -29,7 +29,7 @@ def main():
     parser = OptionParser()
     parser.add_option('-n', help='Problem size', type=int, default=64)
     parser.add_option('-f', help='Fourier mode', type=int, default=1)
-    parser.add_option('-p', help='Number of plots', type=int, default=50)
+    parser.add_option('-p', help='Number of plots', type=int, default=18)
     parser.add_option('-i', help='Iterations per plot', type=int, default=1)
     parser.add_option('-w', help='Jacobi weight', type=float, default=2/3)
     options, args = parser.parse_args()
