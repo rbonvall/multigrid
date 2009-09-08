@@ -43,16 +43,17 @@ def main():
     M = int(sqrt(ceil(options.p/2)))
     N = 2 * M
 
-    def add_plot(p, k):
+    def add_plot(p, k, v):
         subplot(M, N, p)
         plot(v)
         title('%d' % k)
         ylim(-1, 1)
+        print 'k = %2d, error norm = %f' % (k, norm(v))
 
     for k in count():
         if k % options.i == 0:
             plot_nr = 1 + k // options.i
-            add_plot(plot_nr, k)
+            add_plot(plot_nr, k, v)
             if plot_nr >= M * N:
                 break
 
