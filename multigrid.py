@@ -35,6 +35,7 @@ def prolongation_operator(n):
 
 
 def coarse_grid_correction_step(A_h, f_h, u_h, R, P, A_2h):
+    u_h, f_h = u_h.flatten(), f_h.flatten()
     r_h = f_h - A_h.matvec(u_h)
     r_2h = R.matvec(r_h)
     e_2h = scipy.linsolve.spsolve(A_2h, r_2h)

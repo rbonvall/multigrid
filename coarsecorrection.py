@@ -11,7 +11,7 @@ import model_problem
 import gs
 
 def main():
-    N = 64
+    N = 256
     h = 1/N
 
     i_dom = linspace(0.0, 1.0, N + 1)
@@ -19,57 +19,41 @@ def main():
     i, j = meshgrid(i_dom[1:-1], j_dom[1:-1])
 
     A, f = model_problem.create_problem(i, j)
-    u_e = model_problem.exact_u(i, j).flatten()
+    u_e = model_problem.exact_u(i, j)
 
     # operators for coarse grid correction
     R = multigrid.restriction_operator(N)
     P = 4 * R.transpose()
     A_2h = R.matmat(A).matmat(P)
 
-    print "Plotting exact solution"
-    subplot(231)
-    contourf(i, j, u_e.reshape(i.shape))
-    colorbar()
-    title('Exact solution')
+    M, N = 2, 4
+    def add_plot(p, fn, t):
+        subplot(M, N, p)
+        contourf(i, j, fn)
+        colorbar()
+        title(t)
 
-    print "Solving Au = f with conjugate gradient method"
-    u, u_info = scipy.linalg.iterative.cg(A, f, maxiter=10)
-    error = abs(u - u_e)
+    add_plot(1, u_e, 'Exact solution')
 
-    print "Plotting CG solution and error"
-    subplot(232)
-    contourf(i, j, u.reshape(i.shape))
-    colorbar()
-    title('CG solution')
-    subplot(235)
-    contourf(i, j, error.reshape(i.shape))
-    colorbar()
-    title('CG error (norm = %f)' % norm(error))
-
-    # initial guess
-    u = zeros_like(u)
+    u = zeros_like(u_e)
+    #add_plot(2, u, 'Initial guess')
 
     # pre-smoothing
-    for _ in xrange(2):
-        gs.red_black_gauss_seidel_step(u.reshape((N - 1, N - 1)), f, h)
+    for k in (3, 4):
+        gs.red_black_gauss_seidel_step(u, f, h)
+        add_plot(k, u, 'Pre-smoothing step')
 
     # coarse grid correction
     e_h = multigrid.coarse_grid_correction_step(A, f, u, R, P, A_2h)
+    add_plot(5, u, 'Coarse grid correction')
 
     # post-smoothing
-    for _ in xrange(2):
-        gs.red_black_gauss_seidel_step(u.reshape((N - 1, N - 1)), f, h)
+    for k in (6, 7):
+        gs.red_black_gauss_seidel_step(u, f, h)
+        add_plot(k, u, 'Post-smoothing step')
     
-    subplot(233)
-    contourf(i, j, u.reshape(i.shape))
-    colorbar()
-    title('Coarse grid correction')
-
-    subplot(236)
     error = abs(u - u_e)
-    contourf(i, j, error.reshape(i.shape))
-    colorbar()
-    title('CG error (norm = %f)' % norm(error))
+    add_plot(8, error, 'Error (norm = %f)' % norm(error))
 
     show()
 

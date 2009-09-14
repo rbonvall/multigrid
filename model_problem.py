@@ -31,6 +31,6 @@ def problem_A(N):
 def create_problem(i, j):
     N, h = len(i) + 1, i[0, 1] - i[0, 0]
     A = problem_A(N)
-    f = (h**2 * problem_f(i, j)).flatten()
+    f = h**2 * problem_f(i, j)
     return A, f
 
