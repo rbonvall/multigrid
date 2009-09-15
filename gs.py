@@ -25,7 +25,7 @@ def red_black_gauss_seidel_step(u, f, h):
     weave.inline(code, 'm n u f h'.split(),
                  type_converters=weave.converters.blitz,
                  verbose=1)
-    
+
 
 def pure_python_red_black_gauss_seidel_step(u, f, h):
     m, n = u.shape
@@ -63,7 +63,7 @@ def main():
     j_dom = linspace(0.0, 1.0, N + 1)
     i, j = meshgrid(i_dom, j_dom)
     h = i_dom[1] - i_dom[0]
-    
+
     # create model problem, from Multigrid Tutorial slides
     def source(i, j):
         return 2 * ((1 - 6 * i**2) * j**2 * (1 - j**2) +
