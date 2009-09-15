@@ -46,7 +46,7 @@ def main():
         add_plot(k + N, error, 'Error %d: %f' % (k, norm(error)))
 
     # coarse grid correction
-    e_h = multigrid.coarse_grid_correction_step(A, f, u, R, P, A_2h)
+    e_h = multigrid.coarse_grid_correction_step(A, f, u, A_2h)
     add_plot(5, u, 'Coarse grid correction')
     error = abs(u_e - u)
     add_plot(5 + N, error, 'Error %d: %f' % (5, norm(error)))
