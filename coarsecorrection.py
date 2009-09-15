@@ -26,7 +26,7 @@ def main():
     P = 4 * R.transpose()
     A_2h = R.matmat(A).matmat(P)
 
-    M, N = 2, 4
+    M, N = 2, 7
     def add_plot(p, fn, t):
         subplot(M, N, p)
         contourf(i, j, fn)
@@ -42,18 +42,21 @@ def main():
     for k in (3, 4):
         gs.red_black_gauss_seidel_step(u, f, h)
         add_plot(k, u, 'Pre-smoothing step')
+        error = abs(u_e - u)
+        add_plot(k + N, error, 'Error %d: %f' % (k, norm(error)))
 
     # coarse grid correction
     e_h = multigrid.coarse_grid_correction_step(A, f, u, R, P, A_2h)
     add_plot(5, u, 'Coarse grid correction')
+    error = abs(u_e - u)
+    add_plot(5 + N, error, 'Error %d: %f' % (5, norm(error)))
 
     # post-smoothing
     for k in (6, 7):
         gs.red_black_gauss_seidel_step(u, f, h)
         add_plot(k, u, 'Post-smoothing step')
-    
-    error = abs(u - u_e)
-    add_plot(8, error, 'Error (norm = %f)' % norm(error))
+        error = abs(u_e - u)
+        add_plot(k + N, error, 'Error: %f' % norm(error))
 
     show()
 
