@@ -9,18 +9,21 @@ from scipy import weave
 from scipy.linalg import norm
 import time
 
+# assumes boundary buffer
 def red_black_gauss_seidel_step(u, f, h):
     m, n = u.shape
     code = '''
         double h2 = (double) h * (double) h;
         for (int sweep = 0; sweep <= 1; ++sweep)
-            for (int i = 1; i < m - 1; ++i)
-                for (int j = (sweep ? 2 - i % 2 : 1 + i % 2); j < n - 1; j += 2)
+            for (int i = 1; i < m - 1; ++i) {
+                int start(sweep == 0 ? 1 + i % 2 : 2 - i % 2);
+                for (int j = start; j < n - 1; j += 2)
                     u(i, j) = (u(i + 1, j) +
                                u(i - 1, j) +
                                u(i, j + 1) +
                                u(i, j - 1) +
                                h2 * f(i, j)) * 0.25;
+            }
     '''
     weave.inline(code, 'm n u f h'.split(),
                  type_converters=weave.converters.blitz,

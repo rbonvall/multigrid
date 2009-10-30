@@ -56,6 +56,7 @@ def coarse_grid_correction_step(A_h, f_h, u_h, A_2h):
     return e_h
 
 
+# assumes boundary buffer
 def restrict(u_h, weighting='full'):
     m_h, n_h = u_h.shape
     m_2h, n_2h = (m_h + 1)//2 - 1, (n_h + 1)//2 - 1,
@@ -84,6 +85,7 @@ def restrict(u_h, weighting='full'):
                  verbose=1)
     return u_2h
 
+# assumes boundary buffer
 def prolongate(u_2h):
     m_2h, n_2h = u_2h.shape
     m_h, n_h = (m_2h + 1) * 2 - 1, (n_2h + 1) * 2 - 1,
