@@ -112,9 +112,9 @@ def main():
         avg_iteration_time = (time.clock() - start) / iterations_per_plot
         previous_error, new_error = new_error, norm(u - exact_u)
         if options.verbose:
-            improval = abs((previous_error - new_error)/previous_error)
+            improvement = abs((previous_error - new_error)/previous_error)
             print 'k=%d to %d' % (iteration, iteration + iterations_per_plot),
-            print '[avg improval: %f]' % (improval/iterations_per_plot),
+            print '[avg improvement: %f]' % (improvement/iterations_per_plot),
             print '[avg time: %f]' % (avg_iteration_time)
         iteration += iterations_per_plot
         add_plot(p, u, 'k = %d (error = %f)' % (iteration, new_error))
